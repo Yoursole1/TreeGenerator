@@ -74,27 +74,34 @@ public class TreeSkeleton {
 
         // trunk generator
         List<Node> tipNodes = new ArrayList<>(); //Nodes that can currently be appended to (removed after a connection is made)
+        List<Float> tipAngles = new ArrayList<>(); //angles that each tip is at (associated by index)
+
         tipNodes.add(new Node(50, 100)); //initial node
+        tipAngles.add(0f);
 
-        int trunkSize = Math.abs((int) (TreeSkeleton.sampleNormal(10, 3, 15))); //height of trunk (# nodes from base to a tip)
-        float angle = 0; // degrees
+        int trunkSize = Math.abs((int) (TreeSkeleton.sampleNormal(15, 2, 15))); //height of trunk (# nodes from base to a tip)
 
-        for (int i = 0; i < trunkSize; i++) {
-            float addition = TreeSkeleton.sampleNormal(0, 10 * spread * TreeSkeleton.sigmoid(skeleton.getSize()) - 5, 30); //todo maybe bias mean to one side
-            angle += addition;
-            //todo also make trunk generated with splits and spread not just spread
+        for (int i = 0; i < trunkSize; i++) { // height of tree
+            for (int j = 0; j < tipNodes.size(); j++) { // grow each tip
 
-            NumericalBase starting = new NumericalBase(0, -5);
-            starting = starting.rotate(angle * Math.PI / 180); // convert to radians
+                //TODO select if a split will happen here
 
-            //----------
-            starting = (NumericalBase) starting.add(new NumericalBase(tipNodes.get(0).x, tipNodes.get(0).y)); // HARDCODED ASSUMING TIP NODES HAS NO SPLITS -- MUST FIX // TODO
+                float addition = TreeSkeleton.sampleNormal(0, 10 * spread * TreeSkeleton.sigmoid(skeleton.getSize()) - 5, 30); //todo maybe bias mean to one side
+                tipAngles.set(j, tipAngles.get(j) + addition); // increment the angle of the branch
 
-            tipNodes.add(new Node((float) starting.getReal(), (float) starting.getImaginary()));
-            skeleton.addBranch(new Branch(tipNodes.get(0), tipNodes.get(1), 1));
-            tipNodes.remove(0);
-            //----------
 
+                NumericalBase starting = new NumericalBase(0, -5);
+                starting = starting.rotate(tipAngles.get(j) * Math.PI / 180); // convert to radians
+
+                //----------
+                starting = (NumericalBase) starting.add(new NumericalBase(tipNodes.get(0).x, tipNodes.get(0).y));
+
+                Node newNode = new Node((float) starting.getReal(), (float) starting.getImaginary());
+                skeleton.addBranch(new Branch(tipNodes.get(j), newNode, 1));
+                tipNodes.set(j, newNode);
+
+
+            }
         }
 
         // main tree structure is composed of Branches with length 5

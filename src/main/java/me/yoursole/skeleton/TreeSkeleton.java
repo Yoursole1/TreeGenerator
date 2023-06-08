@@ -5,6 +5,7 @@ import me.yoursole.math.numerical.complex.NumericalBase;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -75,18 +76,20 @@ public class TreeSkeleton {
         List<Node> tipNodes = new ArrayList<>(); //Nodes that can currently be appended to (removed after a connection is made)
         tipNodes.add(new Node(50, 100)); //initial node
 
-        int trunkSize = Math.abs((int) (TreeSkeleton.sampleNormal(10, 3, 15))); //select number of nodes in the trunk
+        int trunkSize = Math.abs((int) (TreeSkeleton.sampleNormal(10, 3, 15))); //height of trunk (# nodes from base to a tip)
         float angle = 0; // degrees
 
         for (int i = 0; i < trunkSize; i++) {
-            angle += TreeSkeleton.sampleNormal(0, 10 * spread * TreeSkeleton.sigmoid(skeleton.getSize()) - 5, 30); //todo maybe bias mean to one side
+            float addition = TreeSkeleton.sampleNormal(0, 10 * spread * TreeSkeleton.sigmoid(skeleton.getSize()) - 5, 30); //todo maybe bias mean to one side
+            angle += addition;
             //todo also make trunk generated with splits and spread not just spread
 
-            NumericalBase starting = new NumericalBase(0, 5);
+            NumericalBase starting = new NumericalBase(0, -5);
             starting = starting.rotate(angle * Math.PI / 180); // convert to radians
 
             //----------
-            starting.add(new NumericalBase(tipNodes.get(0).x, tipNodes.get(0).y)); // HARDCODED ASSUMING TIP NODES HAS NO SPLITS -- MUST FIX // TODO
+            starting = (NumericalBase) starting.add(new NumericalBase(tipNodes.get(0).x, tipNodes.get(0).y)); // HARDCODED ASSUMING TIP NODES HAS NO SPLITS -- MUST FIX // TODO
+
             tipNodes.add(new Node((float) starting.getReal(), (float) starting.getImaginary()));
             skeleton.addBranch(new Branch(tipNodes.get(0), tipNodes.get(1), 1));
             tipNodes.remove(0);

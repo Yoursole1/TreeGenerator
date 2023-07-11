@@ -80,36 +80,86 @@ public class TreeSkeleton {
         tipAngles.add(0f);
 
         int trunkSize = Math.abs((int) (TreeSkeleton.sampleNormal(15, 2, 15))); //height of trunk (# nodes from base to a tip)
+        int timeSinceSplit = 1; // cant be 0 because std of 0 breaks stuff
 
         for (int i = 0; i < trunkSize; i++) { // height of tree
             for (int j = 0; j < tipNodes.size(); j++) { // grow each tip
 
-                //TODO select if a split will happen here
+                boolean isSplit = (sampleNormal(0, sigmoid(timeSinceSplit), 1) > (1 - split));
 
-                float addition = TreeSkeleton.sampleNormal(0, 10 * spread * TreeSkeleton.sigmoid(skeleton.getSize()) - 5, 30); //todo maybe bias mean to one side
-                tipAngles.set(j, tipAngles.get(j) + addition); // increment the angle of the branch
+                if(isSplit){ //do a split
+                    timeSinceSplit = 0;
 
+                    float additionA = TreeSkeleton.sampleNormal(10, 10 * spread * TreeSkeleton.sigmoid(skeleton.getSize()) - 5, 30);
+                    float additionB = TreeSkeleton.sampleNormal(-10, 10 * spread * TreeSkeleton.sigmoid(skeleton.getSize()) - 5, 30);
 
-                NumericalBase starting = new NumericalBase(0, -5);
-                starting = starting.rotate(tipAngles.get(j) * Math.PI / 180); // convert to radians
+                    float angle = tipAngles.get(j);
 
-                //----------
-                starting = (NumericalBase) starting.add(new NumericalBase(tipNodes.get(0).x, tipNodes.get(0).y));
+                    //B side
+                    tipAngles.add(angle + additionB);
 
-                Node newNode = new Node((float) starting.getReal(), (float) starting.getImaginary());
-                skeleton.addBranch(new Branch(tipNodes.get(j), newNode, 1));
-                tipNodes.set(j, newNode);
+                    NumericalBase startingB = new NumericalBase(0, -5);
+                    startingB = startingB.rotate((angle + additionB) * Math.PI / 180); // convert to radians
+
+                    //----------
+                    startingB = (NumericalBase) startingB.add(new NumericalBase(tipNodes.get(j).x, tipNodes.get(j).y));
+
+                    Node newNodeB = new Node((float) startingB.getReal(), (float) startingB.getImaginary());
+                    skeleton.addBranch(new Branch(tipNodes.get(j), newNodeB, 1));
+                    tipNodes.add(newNodeB);
+
+                    //A side
+                    tipAngles.set(j, angle + additionA);
+                    NumericalBase starting = new NumericalBase(0, -5);
+                    starting = starting.rotate(tipAngles.get(j) * Math.PI / 180); // convert to radians
+
+                    //----------
+                    starting = (NumericalBase) starting.add(new NumericalBase(tipNodes.get(j).x, tipNodes.get(j).y));
+
+                    Node newNode = new Node((float) starting.getReal(), (float) starting.getImaginary());
+                    skeleton.addBranch(new Branch(tipNodes.get(j), newNode, 1));
+                    tipNodes.set(j, newNode);
+
+                }else{ //grow as normal
+
+                    float addition = TreeSkeleton.sampleNormal(0, 10 * spread * TreeSkeleton.sigmoid(skeleton.getSize()) - 5, 30); //todo maybe bias mean to one side
+                    float gravityBias = (addition / Math.abs(addition)) * (40 * sigmoid((float) ((1/10.0) * trunkSize + 6)) - 10);
+                    tipAngles.set(j, tipAngles.get(j) + addition + gravityBias); // increment the angle of the branch
+
+                    Branch created = TreeSkeleton.createBranch(tipNodes.get(j), tipAngles.get(j), 1);
+                    skeleton.addBranch(created);
+                    tipNodes.set(j, created.getB());
+
+                }
 
 
             }
+            timeSinceSplit++;
         }
 
         // main tree structure is composed of Branches with length 5
         return skeleton;
     }
 
+    /**
+     * @param base node where the branch starts
+     * @param angle that the branch extends at (0 being vertical)
+     */
+    private static Branch createBranch(Node base, float angle, float size){
+
+        NumericalBase starting = new NumericalBase(0, -5);
+        starting = starting.rotate(angle * Math.PI / 180);
+
+        starting = (NumericalBase) starting.add(new NumericalBase(base.x, base.y));
+        Node newNode = new Node((float) starting.getReal(), (float) starting.getImaginary());
+        return new Branch(base, newNode, size);
+    }
+
     private static float sampleNormal(float mean, float std, float max){ //max should be like 30 for splits (guess)
-        float value = 0; // odds of 0 being selected are '0', and we don't want 0 anyways
+        if(std == 0){
+            throw new IllegalArgumentException("standard deviation can not be 0");
+        }
+        float value = 0; // odds of 0 being selected are '0', and we don't want 0 anyway
 
         while (value == 0 || Math.abs(value) > max){
             value = (float) (new Random().nextGaussian() * std + mean);

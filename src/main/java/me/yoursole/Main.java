@@ -11,7 +11,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
-        TreeSkeleton skeleton = TreeSkeleton.generateTree(0.2f, 1, 1, 1, 1);
+        TreeSkeleton skeleton = TreeSkeleton.generateTree(0.1f, 0.6f, 1, 1, 1);
         BufferedImage i = skeleton.render();
         ImageIO.write(i, "jpg", new File("tree.jpg"));
     }

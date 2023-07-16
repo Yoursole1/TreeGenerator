@@ -48,7 +48,7 @@ public class TreeSkeleton {
      * @param spread height to width ratio of the tree
      * @param split rate that branches split into more branches at nodes
      * @param branch rate that branches connect to other branches in between nodes
-     * @param pull pull > 0 means the tree mostly branches up, pull < 0 means it branches down
+     * @param pull pull > 0 means the tree mostly branches up, pull < 0 means it branches down (aka gravity strength)
      * @param branchHeight ratio up the tree the branches start at
      * @return a TreeSkeleton with the desired parameters
      */

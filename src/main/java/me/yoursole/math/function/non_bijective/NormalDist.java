@@ -7,25 +7,33 @@ import java.util.Random;
 
 public class NormalDist implements NonBijective {
 
+    private static final Random RANDOM = new Random();
+
     private final double mean;
     private final double std;
 
     public NormalDist(double mean, double std){
-        this.mean = mean;
-        this.std = std;
-    }
-
-    @Override
-    public Numerical f(Numerical... x) {
         if(std == 0){
             throw new IllegalArgumentException("standard deviation can not be 0");
         }
 
-        return new NumericalBase(new Random().nextGaussian() * this.std + this.mean);
+        this.mean = mean;
+        this.std = std;
+    }
+
+    public NormalDist(NumericalBase mean, NumericalBase std){
+        this(mean.getReal(), std.getReal());
+    }
+
+    @Override
+    public Numerical f(Numerical... x) {
+        return new NumericalBase(NormalDist.RANDOM.nextGaussian() * this.std + this.mean);
     }
 
     public NormalDist convolve(NormalDist other){
-        return null;
+        double mean = this.mean + other.mean;
+        double std = Math.sqrt(Math.pow(this.std, 2) + Math.pow(other.std, 2));
+        return new NormalDist(mean, std);
     }
 
 
@@ -33,5 +41,13 @@ public class NormalDist implements NonBijective {
     @Override
     public NonBijective pseudoInverse() {
         return null;
+    }
+
+    public double getMean() {
+        return mean;
+    }
+
+    public double getStd() {
+        return std;
     }
 }

@@ -6,6 +6,9 @@ import me.yoursole.math.numerical.complex.NumericalBase;
 
 public class GeneratorLayer {
 
+    /**
+     * These bivariate functions receive a timestamp and a parameter for whatever this generator is doing
+     */
     private final BivariateFunction meanCurve;
     private final BivariateFunction stdCurve;
 

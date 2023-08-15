@@ -13,8 +13,8 @@ public class NormalDist implements NonBijective {
     private final double std;
 
     public NormalDist(double mean, double std){
-        if(std == 0){
-            throw new IllegalArgumentException("standard deviation can not be 0");
+        if(std <= 0){
+            throw new IllegalArgumentException("standard deviation must be greater than 0");
         }
 
         this.mean = mean;

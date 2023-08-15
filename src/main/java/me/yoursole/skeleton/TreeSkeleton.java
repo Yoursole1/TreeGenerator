@@ -5,7 +5,6 @@ import me.yoursole.math.numerical.complex.NumericalBase;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 

@@ -1,8 +1,8 @@
 package me.yoursole.skeleton.generator;
 
-
+import me.yoursole.math.function.Function;
+import me.yoursole.math.function.non_bijective.NormalDist;
 import me.yoursole.math.numerical.complex.NumericalBase;
-import me.yoursole.skeleton.Branch;
 import me.yoursole.skeleton.Node;
 import me.yoursole.skeleton.TreeSkeleton;
 
@@ -74,7 +74,15 @@ class TrunkGenerator extends GeneratorLayer {
         tipNodes.add(new Node(50, 100)); //initial node
         tipAngles.add(0f);
 
+        int height = (int) ((NumericalBase)new NormalDist(15, 2).f()).getReal();
 
+        Function splitRate = x -> {
+            return x[0].multiply(new NumericalBase(split)); // not linear, should be: split * e ^ (-(x-5)^2)
+        };
+
+        for (int i = 0; i < height; i++) {
+
+        }
 
         // main tree structure is composed of Branches with length 5
         return super.getInput();

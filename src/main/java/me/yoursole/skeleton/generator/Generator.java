@@ -76,11 +76,18 @@ class TrunkGenerator extends GeneratorLayer {
 
         int height = (int) ((NumericalBase)new NormalDist(15, 2).f()).getReal();
 
-        Function splitRate = x -> {
-            return x[0].multiply(new NumericalBase(split)); // not linear, should be: split * e ^ (-(x-5)^2)
+        Function splitRate = x -> { // x is number of branches formed
+            double n = ((NumericalBase)x[0]).getReal();
+
+            return new NumericalBase(split)
+                    .multiply(new NumericalBase(
+                            Math.pow(Math.E, -Math.pow(n-5, 2))
+                    ));
         };
 
         for (int i = 0; i < height; i++) {
+            boolean isSplit = Math.random() < ((NumericalBase)splitRate.f(new NumericalBase(i))).getReal();
+
 
         }
 

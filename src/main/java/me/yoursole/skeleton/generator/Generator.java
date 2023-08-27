@@ -245,7 +245,7 @@ class BranchGenerator extends GeneratorLayer {
 
             return new NumericalBase(split)
                     .multiply(new NumericalBase(
-                            Math.pow(Math.E, -Math.pow(n - 5, 2))
+                            Math.pow(Math.E, -Math.pow(n - 1, 2))
                     ));
         };
 

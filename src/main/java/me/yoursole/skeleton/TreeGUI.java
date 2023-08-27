@@ -20,7 +20,7 @@ public class TreeGUI {
         JLabel imageLabel = new JLabel();
 
         button.addActionListener(e -> {
-            TreeSkeleton skeleton = new Generator(1f, 1f, 2, 3, 2).generate();
+            TreeSkeleton skeleton = new Generator(0.7f, 0.6f, 0.7f, 1f, 1).generate();
             Image treeImage = skeleton.render();
             ImageIcon icon = new ImageIcon(treeImage);
             imageLabel.setIcon(icon);

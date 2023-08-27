@@ -168,12 +168,12 @@ class BranchGenerator extends GeneratorLayer {
 
     @Override
     TreeSkeleton generate(float spread, float split, float branch, float variability, float branchHeight) {
-        this.generate(spread, split, branch, variability, branchHeight, 1f);
+        this.generate(spread, split, branch, variability, branchHeight, 0.9f);
         return super.getInput();
     }
 
     private void generate(float spread, float split, float branch, float variability, float branchHeight, float size){
-        if (size <= 0.5){
+        if (size <= 0.6){
             return;
         }
 
@@ -214,7 +214,7 @@ class BranchGenerator extends GeneratorLayer {
 
         // generate and add stuff to the skeleton
 
-        this.generate(spread, split, branch, variability, branchHeight, size*2/3);
+        this.generate(spread, split, branch, variability, branchHeight, size - 0.1f);
     }
 
     private TreeSkeleton generateSubTree(float x, float y, float angle, float size, float variability, float split, float spread){
@@ -226,7 +226,7 @@ class BranchGenerator extends GeneratorLayer {
         tipNodes.add(new Node(x, y)); //initial node
         tipAngles.add(angle);
 
-        int height = (int) ((NumericalBase)new NormalDist(5, variability).f()).getReal();
+        int height = (int) ((NumericalBase)new NormalDist(2, 1).f()).getReal();
 
         Function splitRate = t -> { // x is number of branches formed
             double n = ((NumericalBase)t[0]).getReal();
@@ -251,8 +251,8 @@ class BranchGenerator extends GeneratorLayer {
                 if (isSplit && j == splitIndex){
                     // perform split
 
-                    NumericalBase angleA = (NumericalBase) new NormalDist(spread * -10,  variability * 10).f().add(currentAngle); // angle of branches from a split
-                    NumericalBase angleB = (NumericalBase) new NormalDist(spread * 10,  variability * 10).f().add(currentAngle);
+                    NumericalBase angleA = (NumericalBase) new NormalDist(spread * -20,  variability * 10).f().add(currentAngle); // angle of branches from a split
+                    NumericalBase angleB = (NumericalBase) new NormalDist(spread * 20,  variability * 10).f().add(currentAngle);
 
                     Branch branchA = super.createBranch(
                             currentNode,

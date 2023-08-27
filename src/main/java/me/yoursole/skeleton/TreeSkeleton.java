@@ -10,6 +10,10 @@ import java.util.Random;
 
 public class TreeSkeleton {
 
+    public static final int WIDTH = 150;
+    public static final int HEIGHT = 300;
+
+
     private final List<Branch> branches;
 
     public TreeSkeleton() {
@@ -50,7 +54,7 @@ public class TreeSkeleton {
         List<Node> tipNodes = new ArrayList<>(); //Nodes that can currently be appended to (removed after a connection is made)
         List<Float> tipAngles = new ArrayList<>(); //angles that each tip is at (associated by index)
 
-        tipNodes.add(new Node(50, 100)); //initial node
+        tipNodes.add(new Node((float) WIDTH / 2, HEIGHT)); //initial node
         tipAngles.add(0f);
 
         int trunkSize = Math.abs((int) (TreeSkeleton.sampleNormal(15, 2, 15))); //height of trunk (# nodes from base to a tip)
@@ -158,11 +162,11 @@ public class TreeSkeleton {
     }
 
     public BufferedImage render() {
-        BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+        BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         int white = Color.WHITE.getRGB();
         int black = Color.BLACK.getRGB();
-        for (int x = 0; x < 100; x++) {
-            for (int y = 0; y < 100; y++) {
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
                 if (this.isBlack(x, y)) {
                     image.setRGB(x, y, black);
                     continue;

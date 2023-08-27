@@ -10,7 +10,7 @@ public class Branch {
     private final float angle; //in degrees
 
 
-    public Branch(Node a, Node b, float size, float angle){
+    public Branch(Node a, Node b, float size, float angle) {
         this.a = a;
         this.b = b;
         this.size = size;
@@ -30,7 +30,7 @@ public class Branch {
         return a;
     }
 
-    public float getAngle(){
+    public float getAngle() {
         return this.angle;
     }
 }

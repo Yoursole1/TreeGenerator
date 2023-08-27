@@ -49,14 +49,23 @@ public class TreeGUI {
         button.addActionListener(e -> generateTree(sliders, imageLabel, frame));
 
         saveButton.addActionListener(e -> {
-            BufferedImage img = new BufferedImage(imageLabel.getWidth(), imageLabel.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            Graphics g = img.createGraphics();
-            imageLabel.paint(g);
-            g.dispose();
-            try {
-                ImageIO.write(img, "JPG", new File("tree.jpg"));
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Specify a file to save");
+            int userSelection = fileChooser.showSaveDialog(frame);
+
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File fileToSave = fileChooser.getSelectedFile();
+
+                BufferedImage img = new BufferedImage(imageLabel.getWidth(), imageLabel.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                Graphics g = img.createGraphics();
+                imageLabel.paint(g);
+                g.dispose();
+
+                try {
+                    ImageIO.write(img, "JPG", fileToSave);
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
             }
         });
 

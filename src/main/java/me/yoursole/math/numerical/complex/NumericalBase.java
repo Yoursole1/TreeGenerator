@@ -17,24 +17,24 @@ public class NumericalBase implements Numerical {
     private final double real;
     private final double imaginary;
 
-    public NumericalBase(double real, double imaginary){
+    public NumericalBase(double real, double imaginary) {
         this.real = real;
         this.imaginary = imaginary;
     }
 
-    public NumericalBase(double real){
+    public NumericalBase(double real) {
         this(real, 0);
     }
 
-    public NumericalBase complexConjugate(){
+    public NumericalBase complexConjugate() {
         return new NumericalBase(this.real, -this.imaginary);
     }
 
-    public double arg(){
-        return Math.atan(imaginary/real);
+    public double arg() {
+        return Math.atan(imaginary / real);
     }
 
-    public double modulo(){
+    public double modulo() {
         return Math.sqrt(Math.pow(real, 2) + Math.pow(imaginary, 2));
     }
 
@@ -42,13 +42,14 @@ public class NumericalBase implements Numerical {
     /**
      * Generates a rotation matrix with the same rotational properties as
      * the complex number when multiplied by a 2D vector
-     *
+     * <p>
      * This works using the fact that complex number rotate by adding arguments when multiplied, and they
      * scale the modulus through multiplication.  This means that the behavior of
      * any complex number when multiplied can be represented as a 2x2 matrix.
+     *
      * @return rotation matrix
      */
-    public Matrix getMatrixForm(){
+    public Matrix getMatrixForm() {
         double theta = this.arg();
 
         Matrix rotation = new Matrix(new Numerical[][]{
@@ -59,7 +60,7 @@ public class NumericalBase implements Numerical {
         return rotation;
     }
 
-    public NumericalBase rotate(double angle){
+    public NumericalBase rotate(double angle) {
         NumericalBase rotation = new NumericalBase(Math.cos(angle), Math.sin(angle));
 
         return (NumericalBase) rotation.multiply(this);

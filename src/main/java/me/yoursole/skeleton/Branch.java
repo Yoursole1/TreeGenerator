@@ -8,7 +8,7 @@ public class Branch {
     private final float size;
 
 
-    public Branch(Node a, Node b, float size){
+    public Branch(Node a, Node b, float size) {
         this.a = a;
         this.b = b;
         this.size = size;

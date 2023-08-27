@@ -14,7 +14,7 @@ public final class Node {
         this.y = y;
     }
 
-    public double distance(Node other){
-        return Math.sqrt(Math.pow((double)x - (double)other.x, 2) + Math.pow((double)y - (double)other.y, 2));
+    public double distance(Node other) {
+        return Math.sqrt(Math.pow((double) x - (double) other.x, 2) + Math.pow((double) y - (double) other.y, 2));
     }
 }

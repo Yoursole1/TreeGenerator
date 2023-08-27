@@ -8,23 +8,23 @@ public class Scalar implements NonBijective {
 
     public Numerical scale;
 
-    public Scalar(Numerical scale){
+    public Scalar(Numerical scale) {
         this.scale = scale;
     }
 
     @Override
     public Numerical f(Numerical... x) {
-        if(x.length != 1){
+        if (x.length != 1) {
             throw new IllegalArgumentException("Only one row may be input");
         }
 
         Numerical rowA = x[0];
 
-        if(!(rowA instanceof Matrix)){
+        if (!(rowA instanceof Matrix)) {
             throw new IllegalArgumentException("Both terms must be a matrix");
         }
 
-        Numerical[] a =  ((Matrix) rowA).getGroup(0, false);
+        Numerical[] a = ((Matrix) rowA).getGroup(0, false);
 
 
         for (int i = 0; i < a.length; i++) {

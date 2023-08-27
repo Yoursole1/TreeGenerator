@@ -19,7 +19,7 @@ public class Generator {
     private final float pull;
     private final float branchHeight;
 
-    public Generator(float spread, float split, float branch, float pull, float branchHeight){
+    public Generator(float spread, float split, float branch, float pull, float branchHeight) {
         // TODO verify all values are 0 < x < 1
 
         this.spread = spread;
@@ -29,14 +29,13 @@ public class Generator {
         this.branchHeight = branchHeight;
     }
 
-    public TreeSkeleton generate(){
+    public TreeSkeleton generate() {
         TreeSkeleton skeleton = new TreeSkeleton();
         skeleton = new TrunkGenerator(skeleton).generate(this.spread, this.split, this.branch, this.pull, this.branchHeight);
         skeleton = new BranchGenerator(skeleton).generate(this.spread, this.split, this.branch, this.pull, this.branchHeight);
         skeleton = new GravityGenerator(skeleton).generate(this.spread, this.split, this.branch, this.pull, this.branchHeight);
         return skeleton;
     }
-
 
 
     public float getSpread() {
@@ -77,31 +76,31 @@ class TrunkGenerator extends GeneratorLayer {
         tipNodes.add(new Node(50, 100)); //initial node
         tipAngles.add(0f);
 
-        int height = (int) ((NumericalBase)new NormalDist(15, 2).f()).getReal();
+        int height = (int) ((NumericalBase) new NormalDist(15, 2).f()).getReal();
 
         Function splitRate = x -> { // x is number of branches formed
-            double n = ((NumericalBase)x[0]).getReal();
+            double n = ((NumericalBase) x[0]).getReal();
 
             return new NumericalBase(split)
                     .multiply(new NumericalBase(
-                            Math.pow(Math.E, -Math.pow(n-5, 2))
+                            Math.pow(Math.E, -Math.pow(n - 5, 2))
                     ));
         };
 
-        Function branchSize = x -> new NumericalBase(20 / (((NumericalBase)x[0]).getReal() + 5));
+        Function branchSize = x -> new NumericalBase(20 / (((NumericalBase) x[0]).getReal() + 5));
 
         for (int i = 0; i < height; i++) {
-            boolean isSplit = Math.random() < ((NumericalBase)splitRate.f(new NumericalBase(i))).getReal();
+            boolean isSplit = Math.random() < ((NumericalBase) splitRate.f(new NumericalBase(i))).getReal();
             int splitIndex = new Random().nextInt(tipNodes.size()); // used if we are splitting (only one split per "height layer")
 
             List<Node> tipNodesNew = new ArrayList<>();
             List<Float> tipAnglesNew = new ArrayList<>();
 
-            for (int j = 0; j < tipNodes.size(); j++){
+            for (int j = 0; j < tipNodes.size(); j++) {
                 Node currentNode = tipNodes.get(j);
                 NumericalBase currentAngle = new NumericalBase(tipAngles.get(j));
 
-                if (isSplit && j == splitIndex){
+                if (isSplit && j == splitIndex) {
                     // perform split
 
                     NumericalBase angleA = (NumericalBase) new NormalDist(-10, spread * 10).f().add(currentAngle); // angle of branches from a split
@@ -110,13 +109,13 @@ class TrunkGenerator extends GeneratorLayer {
                     Branch branchA = super.createBranch(
                             currentNode,
                             (float) angleA.getReal(),
-                            (float) ((NumericalBase)branchSize.f(new NumericalBase(i))).getReal()
+                            (float) ((NumericalBase) branchSize.f(new NumericalBase(i))).getReal()
                     );
 
                     Branch branchB = super.createBranch(
                             currentNode,
                             (float) angleB.getReal(),
-                            (float) ((NumericalBase)branchSize.f(new NumericalBase(i))).getReal()
+                            (float) ((NumericalBase) branchSize.f(new NumericalBase(i))).getReal()
                     );
 
                     tipNodesNew.add(branchA.getB());
@@ -137,7 +136,7 @@ class TrunkGenerator extends GeneratorLayer {
                 Branch newBranch = super.createBranch(
                         currentNode,
                         (float) angle.getReal(),
-                        (float) ((NumericalBase)branchSize.f(new NumericalBase(i))).getReal()
+                        (float) ((NumericalBase) branchSize.f(new NumericalBase(i))).getReal()
                 );
 
                 tipNodesNew.add(newBranch.getB());

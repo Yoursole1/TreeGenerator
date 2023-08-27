@@ -9,8 +9,8 @@ public class SquareMatrix extends Matrix {
         super(SquareMatrix.verifySquare(values));
     }
 
-    private static Numerical[][] verifySquare(Numerical[][] values){
-        if (values.length != values[0].length){
+    private static Numerical[][] verifySquare(Numerical[][] values) {
+        if (values.length != values[0].length) {
             throw new IllegalArgumentException("Matrix must be square");
         }
         return values;

@@ -133,7 +133,7 @@ class TrunkGenerator extends GeneratorLayer {
                 }
                 // grow tip node
 
-                NumericalBase angle = (NumericalBase) new NormalDist(0, spread * 10).f().add(currentAngle);
+                NumericalBase angle = (NumericalBase) new NormalDist(0, spread * variability * 10).f().add(currentAngle);
 
                 Branch newBranch = super.createBranch(
                         currentNode,
@@ -168,33 +168,35 @@ class BranchGenerator extends GeneratorLayer {
 
     @Override
     TreeSkeleton generate(float spread, float split, float branch, float variability, float branchHeight) {
-        this.generate(spread, split, branch, variability, branchHeight, 1);
+        this.generate(spread, split, branch, variability, branchHeight, 1f);
         return super.getInput();
     }
 
-    private void generate(float spread, float split, float branch, float variability, float branchHeight, float size) {
-        if (size <= 0.1) {
+    private void generate(float spread, float split, float branch, float variability, float branchHeight, float size){
+        if (size <= 0.5){
             return;
         }
 
         Random r = new Random();
 
-        // size 1 -> 2/3 -> 4/9 -> 8/27
-        for (Branch b : super.getInput().getBranches()) {
+        List<TreeSkeleton> branches = new ArrayList<>();
 
-            if (!(b.getSize() > size)) {
+        // size 1 -> 2/3 -> 4/9 -> 8/27
+        for (Branch b : super.getInput().getBranches()){
+
+            if (!(b.getSize() > size) || Math.abs(b.getSize() - size) > 1){
                 continue;
             }
 
-            boolean shouldBranch = Math.random() > branch;
+            boolean shouldBranch = Math.random() < branch;
 
-            if (!shouldBranch) {
+            if (!shouldBranch){
                 continue;
             }
 
             float baseAngle = Math.random() > 0.5 ? 90 : -90;
             baseAngle += b.getAngle(); // shift the angle to be relative to the angle of the branch its coming from
-            baseAngle += ((NumericalBase) new NormalDist(0, 5).f()).getReal();
+            baseAngle += ((NumericalBase)new NormalDist(0, 5).f()).getReal();
 
             float high = Math.max(b.getA().x, b.getB().x);
             float low = Math.min(b.getA().x, b.getB().x);
@@ -203,16 +205,101 @@ class BranchGenerator extends GeneratorLayer {
             float m = (b.getA().y - b.getB().y) / (b.getA().x - b.getB().x);
             float y = m * x - m * b.getA().x + b.getA().y;
 
-            super.getInput().merge(this.generateSubTree(x, y, baseAngle, size));
+            branches.add(this.generateSubTree(x, y, baseAngle, size, variability, split, spread));
+        }
+
+        for (TreeSkeleton skeleton : branches){
+            super.getInput().merge(skeleton);
         }
 
         // generate and add stuff to the skeleton
 
-        this.generate(spread, split, branch, variability, branchHeight, size * 2 / 3);
+        this.generate(spread, split, branch, variability, branchHeight, size*2/3);
     }
 
-    private TreeSkeleton generateSubTree(float x, float y, float angle, float size) {
-        return new TreeSkeleton();
+    private TreeSkeleton generateSubTree(float x, float y, float angle, float size, float variability, float split, float spread){
+        TreeSkeleton subtree = new TreeSkeleton();
+
+        List<Node> tipNodes = new ArrayList<>(); //Nodes that can currently be appended to (removed after a connection is made)
+        List<Float> tipAngles = new ArrayList<>(); //angles that each tip is at (associated by index)
+
+        tipNodes.add(new Node(x, y)); //initial node
+        tipAngles.add(angle);
+
+        int height = (int) ((NumericalBase)new NormalDist(5, variability).f()).getReal();
+
+        Function splitRate = t -> { // x is number of branches formed
+            double n = ((NumericalBase)t[0]).getReal();
+
+            return new NumericalBase(split)
+                    .multiply(new NumericalBase(
+                            Math.pow(Math.E, -Math.pow(n - 5, 2))
+                    ));
+        };
+
+        for (int i = 0; i < height; i++) {
+            boolean isSplit = Math.random() < ((NumericalBase)splitRate.f(new NumericalBase(i))).getReal();
+            int splitIndex = new Random().nextInt(tipNodes.size()); // used if we are splitting (only one split per "height layer")
+
+            List<Node> tipNodesNew = new ArrayList<>();
+            List<Float> tipAnglesNew = new ArrayList<>();
+
+            for (int j = 0; j < tipNodes.size(); j++){
+                Node currentNode = tipNodes.get(j);
+                NumericalBase currentAngle = new NumericalBase(tipAngles.get(j));
+
+                if (isSplit && j == splitIndex){
+                    // perform split
+
+                    NumericalBase angleA = (NumericalBase) new NormalDist(spread * -10,  variability * 10).f().add(currentAngle); // angle of branches from a split
+                    NumericalBase angleB = (NumericalBase) new NormalDist(spread * 10,  variability * 10).f().add(currentAngle);
+
+                    Branch branchA = super.createBranch(
+                            currentNode,
+                            (float) angleA.getReal(),
+                            size
+                    );
+
+                    Branch branchB = super.createBranch(
+                            currentNode,
+                            (float) angleB.getReal(),
+                            size
+                    );
+
+                    tipNodesNew.add(branchA.getB());
+                    tipNodesNew.add(branchB.getB());
+
+                    tipAnglesNew.add((float) angleA.getReal());
+                    tipAnglesNew.add((float) angleB.getReal());
+
+                    subtree.addBranch(branchA);
+                    subtree.addBranch(branchB);
+
+                    continue;
+                }
+                // grow tip node
+
+                NumericalBase a = (NumericalBase) new NormalDist(0, variability * spread * 10).f().add(currentAngle);
+
+                Branch newBranch = super.createBranch(
+                        currentNode,
+                        (float) a.getReal(),
+                        size
+                );
+
+                tipNodesNew.add(newBranch.getB());
+
+                tipAnglesNew.add((float) a.getReal());
+
+                subtree.addBranch(newBranch);
+            }
+
+            tipNodes = tipNodesNew;
+            tipAngles = tipAnglesNew;
+        }
+
+
+        return subtree;
     }
 }
 

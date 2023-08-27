@@ -40,23 +40,49 @@ public class TreeSkeleton {
     public BufferedImage render() {
         BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         int white = Color.WHITE.getRGB();
-        int black = Color.BLACK.getRGB();
+        int black = Color.DARK_GRAY.getRGB();
+        int green = getRandomGreen();
+
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
+                if (this.isGreen(x, y)){
+                    image.setRGB(x, y, green);
+                    green = getRandomGreen();
+                    continue;
+                }
                 if (this.isBlack(x, y)) {
                     image.setRGB(x, y, black);
                     continue;
                 }
+
                 image.setRGB(x, y, white);
             }
         }
         return image;
     }
 
+    public static int getRandomGreen() {
+        Random random = new Random();
+        int greenValue = random.nextInt(256);
+        return (0) | (greenValue << 8);
+    }
+
     private boolean isBlack(int x, int y) {
 
         for (Branch e : this.branches) {
             if (this.isValid(new Node(x, y), e, e.getSize())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isGreen(int x, int y){
+        for (Branch e : this.branches) {
+            if (e.getSize() > 1f){
+                continue;
+            }
+            if (this.isValid(new Node(x, y), e, e.getSize() + 1f)) {
                 return true;
             }
         }

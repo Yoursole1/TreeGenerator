@@ -9,7 +9,7 @@ public abstract class GeneratorLayer {
 
     private final TreeSkeleton input;
 
-    public GeneratorLayer(TreeSkeleton input) {
+    protected GeneratorLayer(TreeSkeleton input) {
         this.input = input;
     }
 

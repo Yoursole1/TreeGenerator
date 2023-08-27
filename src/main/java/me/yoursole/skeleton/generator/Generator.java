@@ -11,7 +11,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static me.yoursole.skeleton.generator.Generator.*;
+
 public class Generator {
+
+    // Class-level constants
+    protected static final float DEFAULT_HEIGHT_MEAN = 15;
+    protected static final float DEFAULT_HEIGHT_VARIABILITY = 2;
+    protected static final float DEFAULT_ANGLE_SPREAD_NEGATIVE = -10;
+    protected static final float DEFAULT_ANGLE_SPREAD_POSITIVE = 10;
+    protected static final float DEFAULT_ANGLE_VARIABILITY_MULTIPLIER = 10;
+    protected static final float DEFAULT_BRANCH_SIZE = 20;
 
     private final float spread;
     private final float split;
@@ -54,33 +64,14 @@ public class Generator {
         skeleton = new GravityGenerator(skeleton).generate(this.spread, this.split, this.branch, this.variability, this.branchHeight);
         return skeleton;
     }
-
-
-    public float getSpread() {
-        return spread;
-    }
-
-    public float getSplit() {
-        return split;
-    }
-
-    public float getBranch() {
-        return branch;
-    }
-
-    public float getVariability() {
-        return variability;
-    }
-
-    public float getBranchHeight() {
-        return branchHeight;
-    }
 }
 
 /**
  * Generates the trunk section of the tree
  */
 class TrunkGenerator extends GeneratorLayer {
+    // Class-level constants
+    private static final int DEFAULT_SPLIT_INDEX = 5;
 
     public TrunkGenerator(TreeSkeleton input) {
         super(input);
@@ -94,18 +85,18 @@ class TrunkGenerator extends GeneratorLayer {
         tipNodes.add(new Node(TreeSkeleton.WIDTH / 2.0f, TreeSkeleton.HEIGHT)); //initial node
         tipAngles.add(0f);
 
-        int height = (int) ((NumericalBase) new NormalDist(15, 2 * variability).f()).getReal();
+        int height = (int) ((NumericalBase) new NormalDist(DEFAULT_HEIGHT_MEAN, DEFAULT_HEIGHT_VARIABILITY  * variability).f()).getReal();
 
         Function splitRate = x -> { // x is number of branches formed
             double n = ((NumericalBase) x[0]).getReal();
 
             return new NumericalBase(split)
                     .multiply(new NumericalBase(
-                            Math.pow(Math.E, -Math.pow(n - 5, 2))
+                            Math.pow(Math.E, -Math.pow(n - DEFAULT_SPLIT_INDEX, 2))
                     ));
         };
 
-        Function branchSize = x -> new NumericalBase(20 / (((NumericalBase) x[0]).getReal() + 5));
+        Function branchSize = x -> new NumericalBase(DEFAULT_BRANCH_SIZE  / (((NumericalBase) x[0]).getReal() + 5));
 
         for (int i = 0; i < height; i++) {
             boolean isSplit = Math.random() < ((NumericalBase) splitRate.f(new NumericalBase(i))).getReal();
@@ -123,8 +114,8 @@ class TrunkGenerator extends GeneratorLayer {
                 if (isSplit && j == splitIndex) {
                     // perform split
 
-                    NumericalBase angleA = (NumericalBase) new NormalDist(spread * -10, variability * 10).f().add(currentAngle); // angle of branches from a split
-                    NumericalBase angleB = (NumericalBase) new NormalDist(spread * 10, variability * 10).f().add(currentAngle);
+                    NumericalBase angleA = (NumericalBase) new NormalDist(spread * DEFAULT_ANGLE_SPREAD_NEGATIVE, variability * DEFAULT_ANGLE_VARIABILITY_MULTIPLIER).f().add(currentAngle); // angle of branches from a split
+                    NumericalBase angleB = (NumericalBase) new NormalDist(spread * DEFAULT_ANGLE_SPREAD_POSITIVE, variability * DEFAULT_ANGLE_VARIABILITY_MULTIPLIER).f().add(currentAngle);
 
                     Branch branchA = super.createBranch(
                             currentNode,
@@ -151,7 +142,7 @@ class TrunkGenerator extends GeneratorLayer {
                 }
                 // grow tip node
 
-                NumericalBase angle = (NumericalBase) new NormalDist(0, spread * variability * 10).f().add(currentAngle);
+                NumericalBase angle = (NumericalBase) new NormalDist(0, spread * variability * DEFAULT_ANGLE_VARIABILITY_MULTIPLIER).f().add(currentAngle);
 
                 Branch newBranch = super.createBranch(
                         currentNode,
@@ -179,6 +170,9 @@ class TrunkGenerator extends GeneratorLayer {
  * Generates the branches coming off the trunk
  */
 class BranchGenerator extends GeneratorLayer {
+    private static final float BASE_SIZE_REDUCTION = 0.1f;
+    private static final float BASE_SIZE_CUTOFF = 0.6f;
+    private static final float BASE_ANGLE_VARIABILITY = 5;
 
     public BranchGenerator(TreeSkeleton input) {
         super(input);
@@ -191,7 +185,7 @@ class BranchGenerator extends GeneratorLayer {
     }
 
     private void generate(float spread, float split, float branch, float variability, float branchHeight, float size){
-        if (size <= 0.6){
+        if (size <= BASE_SIZE_CUTOFF){
             return;
         }
 
@@ -214,7 +208,7 @@ class BranchGenerator extends GeneratorLayer {
 
             float baseAngle = Math.random() > 0.5 ? 90 : -90;
             baseAngle += b.getAngle(); // shift the angle to be relative to the angle of the branch its coming from
-            baseAngle += ((NumericalBase)new NormalDist(0, 5).f()).getReal();
+            baseAngle += (float) ((NumericalBase)new NormalDist(0, BASE_ANGLE_VARIABILITY).f()).getReal();
 
             float high = Math.max(b.getA().x, b.getB().x);
             float low = Math.min(b.getA().x, b.getB().x);
@@ -232,7 +226,7 @@ class BranchGenerator extends GeneratorLayer {
 
         // generate and add stuff to the skeleton
 
-        this.generate(spread, split, branch, variability, branchHeight, size - 0.1f);
+        this.generate(spread, split, branch, variability, branchHeight, size - BASE_SIZE_REDUCTION);
     }
 
     private TreeSkeleton generateSubTree(float x, float y, float angle, float size, float variability, float split, float spread){
@@ -269,8 +263,8 @@ class BranchGenerator extends GeneratorLayer {
                 if (isSplit && j == splitIndex){
                     // perform split
 
-                    NumericalBase angleA = (NumericalBase) new NormalDist(spread * -20,  variability * 10).f().add(currentAngle); // angle of branches from a split
-                    NumericalBase angleB = (NumericalBase) new NormalDist(spread * 20,  variability * 10).f().add(currentAngle);
+                    NumericalBase angleA = (NumericalBase) new NormalDist(spread * 2 * DEFAULT_ANGLE_SPREAD_NEGATIVE,  variability * DEFAULT_ANGLE_VARIABILITY_MULTIPLIER).f().add(currentAngle); // angle of branches from a split
+                    NumericalBase angleB = (NumericalBase) new NormalDist(spread * 2 * DEFAULT_ANGLE_SPREAD_POSITIVE,  variability * DEFAULT_ANGLE_VARIABILITY_MULTIPLIER).f().add(currentAngle);
 
                     Branch branchA = super.createBranch(
                             currentNode,
@@ -297,7 +291,7 @@ class BranchGenerator extends GeneratorLayer {
                 }
                 // grow tip node
 
-                NumericalBase a = (NumericalBase) new NormalDist(0, variability * spread * 10).f().add(currentAngle);
+                NumericalBase a = (NumericalBase) new NormalDist(0, variability * spread * DEFAULT_ANGLE_VARIABILITY_MULTIPLIER).f().add(currentAngle);
 
                 Branch newBranch = super.createBranch(
                         currentNode,

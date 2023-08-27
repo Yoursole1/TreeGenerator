@@ -71,7 +71,7 @@ public enum AdditionStrategy {
     MATRIX_MATRIX(new NumericalTransformer<Matrix, Matrix>() {
         @Override
         public Numerical operate(Matrix baseA, Matrix baseB) {
-            if(!Arrays.equals(baseA.getDimension(), baseB.getDimension())) {
+            if (!Arrays.equals(baseA.getDimension(), baseB.getDimension())) {
                 throw new IllegalArgumentException("Addition of two matrices with different dimensions");
             }
 
@@ -96,19 +96,13 @@ public enum AdditionStrategy {
         public Class<?> getTypeB() {
             return Matrix.class;
         }
-    })
-;
+    });
 
     private final NumericalTransformer operation;
-
-    public NumericalTransformer getOperation(){
-        return this.operation;
-    }
 
     AdditionStrategy(NumericalTransformer operation) {
         this.operation = operation;
     }
-
 
     public static AdditionStrategy fetch(Numerical left, Numerical right) {
         Class<? extends Numerical> leftType = left.getClass();
@@ -116,12 +110,16 @@ public enum AdditionStrategy {
 
         for (AdditionStrategy strategy : AdditionStrategy.values()) {
             NumericalTransformer<? extends Numerical, ? extends Numerical> operation = strategy.getOperation();
-            if(leftType == operation.getTypeA() && rightType == operation.getTypeB()){
+            if (leftType == operation.getTypeA() && rightType == operation.getTypeB()) {
                 return strategy;
             }
         }
 
         throw new IllegalStateException("No Addition Strategy for given set: " + left.getClass() + " + " + right.getClass());
+    }
+
+    public NumericalTransformer getOperation() {
+        return this.operation;
     }
 
 }

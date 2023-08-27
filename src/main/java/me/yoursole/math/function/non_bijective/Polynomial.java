@@ -11,18 +11,18 @@ public class Polynomial implements NonBijective {
      */
     private final Numerical[] coefficients;
 
-    public Polynomial(Numerical[] coefficients){
+    public Polynomial(Numerical[] coefficients) {
         this.coefficients = coefficients;
     }
 
     /**
-     * @throws IllegalArgumentException if the input is not a single numerical
      * @param x numerical value to evaluate
      * @return f(x)
+     * @throws IllegalArgumentException if the input is not a single numerical
      */
     @Override
     public Numerical f(Numerical... x) {
-        if(x.length != 1){
+        if (x.length != 1) {
             throw new IllegalArgumentException("Multivariable input on 1 -> 1 function");
         }
 

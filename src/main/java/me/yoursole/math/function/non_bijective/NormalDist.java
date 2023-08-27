@@ -12,8 +12,8 @@ public class NormalDist implements NonBijective {
     private final double mean;
     private final double std;
 
-    public NormalDist(double mean, double std){
-        if(std <= 0){
+    public NormalDist(double mean, double std) {
+        if (std <= 0) {
             throw new IllegalArgumentException("standard deviation must be greater than 0");
         }
 
@@ -21,7 +21,7 @@ public class NormalDist implements NonBijective {
         this.std = std;
     }
 
-    public NormalDist(NumericalBase mean, NumericalBase std){
+    public NormalDist(NumericalBase mean, NumericalBase std) {
         this(mean.getReal(), std.getReal());
     }
 
@@ -30,12 +30,11 @@ public class NormalDist implements NonBijective {
         return new NumericalBase(NormalDist.RANDOM.nextGaussian() * this.std + this.mean);
     }
 
-    public NormalDist convolve(NormalDist other){
+    public NormalDist convolve(NormalDist other) {
         double mean = this.mean + other.mean;
         double std = Math.sqrt(Math.pow(this.std, 2) + Math.pow(other.std, 2));
         return new NormalDist(mean, std);
     }
-
 
 
     @Override

@@ -8,22 +8,22 @@ import me.yoursole.math.numerical.complex.NumericalBase;
  * Any mathematical object that does not have free variables
  */
 public interface Numerical extends MathObject {
-    default Numerical add(Numerical other){
+    default Numerical add(Numerical other) {
         AdditionStrategy strategy = AdditionStrategy.fetch(this, other);
         return strategy.getOperation().operate(this, other);
     }
 
-    default Numerical multiply(Numerical other){
+    default Numerical multiply(Numerical other) {
         MultiplicationStrategy strategy = MultiplicationStrategy.fetch(this, other);
         return strategy.getOperation().operate(this, other);
     }
 
-    default Numerical pow(int power){
-        if(power == 0){
+    default Numerical pow(int power) {
+        if (power == 0) {
             return new NumericalBase(1, 0);
         }
 
-        if(power < 0){
+        if (power < 0) {
             throw new IllegalArgumentException("power must be greater than 0");
         }
 

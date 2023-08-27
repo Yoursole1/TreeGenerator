@@ -9,7 +9,7 @@ public abstract class GeneratorLayer {
 
     private final TreeSkeleton input;
 
-    public GeneratorLayer(TreeSkeleton input){
+    public GeneratorLayer(TreeSkeleton input) {
         this.input = input;
     }
 
@@ -19,7 +19,7 @@ public abstract class GeneratorLayer {
         return input;
     }
 
-    protected Branch createBranch(Node base, float angle, float size){ // utility function, prob should be moved elsewhere
+    protected Branch createBranch(Node base, float angle, float size) { // utility function, prob should be moved elsewhere
 
         NumericalBase starting = new NumericalBase(0, -5);
         starting = starting.rotate(angle * Math.PI / 180);

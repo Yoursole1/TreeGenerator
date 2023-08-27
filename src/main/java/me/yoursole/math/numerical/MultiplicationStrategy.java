@@ -59,8 +59,8 @@ public enum MultiplicationStrategy {
             double x = baseB.getReal();
             double y = baseB.getImaginary();
 
-            double newReal = (a*x - b*y);
-            double newIm = (a*y + b*x);
+            double newReal = (a * x - b * y);
+            double newIm = (a * y + b * x);
 
             return new NumericalBase(newReal, newIm);
         }
@@ -107,8 +107,7 @@ public enum MultiplicationStrategy {
         public Class<?> getTypeB() {
             return Matrix.class;
         }
-    })
-    ;
+    });
 
     private final NumericalTransformer operation;
 
@@ -116,23 +115,22 @@ public enum MultiplicationStrategy {
         this.operation = operation;
     }
 
-    public NumericalTransformer getOperation(){
-        return this.operation;
-    }
-
-
     public static MultiplicationStrategy fetch(Numerical left, Numerical right) {
         Class<? extends Numerical> leftType = left.getClass();
         Class<? extends Numerical> rightType = right.getClass();
 
         for (MultiplicationStrategy strategy : MultiplicationStrategy.values()) {
             NumericalTransformer<? extends Numerical, ? extends Numerical> operation = strategy.getOperation();
-            if(leftType == operation.getTypeA() && rightType == operation.getTypeB()){
+            if (leftType == operation.getTypeA() && rightType == operation.getTypeB()) {
                 return strategy;
             }
         }
 
         throw new IllegalStateException("No Multiplication Strategy for given set: " + left.getClass() + " + " + right.getClass());
+    }
+
+    public NumericalTransformer getOperation() {
+        return this.operation;
     }
 
 }

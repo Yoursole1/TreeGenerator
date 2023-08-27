@@ -20,7 +20,25 @@ public class Generator {
     private final float branchHeight;
 
     public Generator(float spread, float split, float branch, float variability, float branchHeight) {
-        // TODO verify all values are 0 < x < 1
+        if (spread < 0 || spread > 1){
+            throw new IllegalArgumentException("spread must be between 0 and 1");
+        }
+
+        if (split < 0 || split > 1){
+            throw new IllegalArgumentException("split must be between 0 and 1");
+        }
+
+        if (branch < 0 || branch > 1){
+            throw new IllegalArgumentException("branch must be between 0 and 1");
+        }
+
+        if (variability < 0 || variability > 1){
+            throw new IllegalArgumentException("variability must be between 0 and 1");
+        }
+
+        if (branchHeight < 0 || branchHeight > 1){
+            throw new IllegalArgumentException("branchHeight must be between 0 and 1");
+        }
 
         this.spread = spread;
         this.split = split;

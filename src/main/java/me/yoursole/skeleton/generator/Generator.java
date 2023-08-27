@@ -73,7 +73,7 @@ class TrunkGenerator extends GeneratorLayer {
         List<Node> tipNodes = new ArrayList<>(); //Nodes that can currently be appended to (removed after a connection is made)
         List<Float> tipAngles = new ArrayList<>(); //angles that each tip is at (associated by index)
 
-        tipNodes.add(new Node(50, 100)); //initial node
+        tipNodes.add(new Node(TreeSkeleton.WIDTH / 2.0f, TreeSkeleton.HEIGHT)); //initial node
         tipAngles.add(0f);
 
         int height = (int) ((NumericalBase) new NormalDist(15, 2 * variability).f()).getReal();

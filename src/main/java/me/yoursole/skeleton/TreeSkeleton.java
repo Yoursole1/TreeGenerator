@@ -1,12 +1,18 @@
 package me.yoursole.skeleton;
 
+import me.yoursole.math.numerical.complex.NumericalBase;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Random;
 
 public class TreeSkeleton {
+
+    public static final int WIDTH = 150;
+    public static final int HEIGHT = 300;
+
 
     private final List<Branch> branches;
 
@@ -32,11 +38,11 @@ public class TreeSkeleton {
     }
 
     public BufferedImage render() {
-        BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+        BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         int white = Color.WHITE.getRGB();
         int black = Color.BLACK.getRGB();
-        for (int x = 0; x < 100; x++) {
-            for (int y = 0; y < 100; y++) {
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
                 if (this.isBlack(x, y)) {
                     image.setRGB(x, y, black);
                     continue;

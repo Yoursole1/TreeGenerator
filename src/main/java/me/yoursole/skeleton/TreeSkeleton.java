@@ -12,46 +12,21 @@ public class TreeSkeleton {
 
     private final List<Branch> branches;
 
-    public TreeSkeleton(){
+    public TreeSkeleton() {
         this.branches = new ArrayList<>();
     }
 
-    public void addBranch(Branch branch){
-        this.branches.add(branch);
-    }
-
-    public int getSize(){
-        return this.branches.size();
-    }
-
-    public BufferedImage render(){
-        BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-        int white = Color.WHITE.getRGB();
-        int black = Color.BLACK.getRGB();
-        for (int x = 0; x < 100; x++) {
-            for (int y = 0; y < 100; y++) {
-                if(this.isBlack(x, y)) {
-                    image.setRGB(x, y, black);
-                    continue;
-                }
-                image.setRGB(x, y, white);
-            }
-        }
-        return image;
-    }
-
-
-
     /**
      * All parameters MUST be between 0 and 1
-     * @param spread height to width ratio of the tree
-     * @param split rate that branches split into more branches at nodes
-     * @param branch rate that branches connect to other branches in between nodes
-     * @param pull pull > 0.5 means the tree mostly branches up, pull < 0.5 means it branches down (aka gravity strength)
+     *
+     * @param spread       height to width ratio of the tree
+     * @param split        rate that branches split into more branches at nodes
+     * @param branch       rate that branches connect to other branches in between nodes
+     * @param pull         pull > 0.5 means the tree mostly branches up, pull < 0.5 means it branches down (aka gravity strength)
      * @param branchHeight ratio up the tree the branches start at
      * @return a TreeSkeleton with the desired parameters
      */
-    public static TreeSkeleton generateTree(float spread, float split, float branch, float pull, float branchHeight){
+    public static TreeSkeleton generateTree(float spread, float split, float branch, float pull, float branchHeight) {
         //todo validate that all params are between 0 and 1
 
         TreeSkeleton skeleton = new TreeSkeleton();
@@ -86,7 +61,7 @@ public class TreeSkeleton {
 
                 boolean isSplit = (sampleNormal(0, sigmoid(timeSinceSplit), 1) > (1 - split));
 
-                if(isSplit){ //do a split
+                if (isSplit) { //do a split
                     timeSinceSplit = 0;
 
                     float additionA = TreeSkeleton.sampleNormal(10, 10 * spread * TreeSkeleton.sigmoid(skeleton.getSize()) - 5, 30);
@@ -119,10 +94,10 @@ public class TreeSkeleton {
                     skeleton.addBranch(new Branch(tipNodes.get(j), newNode, 1));
                     tipNodes.set(j, newNode);
 
-                }else{ //grow as normal
+                } else { //grow as normal
 
                     float addition = TreeSkeleton.sampleNormal(0, 10 * spread * TreeSkeleton.sigmoid(skeleton.getSize()) - 5, 30); //todo maybe bias mean to one side
-                    float gravityBias = (addition / Math.abs(addition)) * (40 * sigmoid((float) ((1/10.0) * trunkSize + 6)) - 10);
+                    float gravityBias = (addition / Math.abs(addition)) * (40 * sigmoid((float) ((1 / 10.0) * trunkSize + 6)) - 10);
                     tipAngles.set(j, tipAngles.get(j) + addition + gravityBias); // increment the angle of the branch
 
                     Branch created = TreeSkeleton.createBranch(tipNodes.get(j), tipAngles.get(j), 1);
@@ -141,10 +116,10 @@ public class TreeSkeleton {
     }
 
     /**
-     * @param base node where the branch starts
+     * @param base  node where the branch starts
      * @param angle that the branch extends at (0 being vertical)
      */
-    private static Branch createBranch(Node base, float angle, float size){
+    private static Branch createBranch(Node base, float angle, float size) {
 
         NumericalBase starting = new NumericalBase(0, -5);
         starting = starting.rotate(angle * Math.PI / 180);
@@ -154,31 +129,54 @@ public class TreeSkeleton {
         return new Branch(base, newNode, size);
     }
 
-    private static float sampleNormal(float mean, float std, float max){ //max should be like 30 for splits (guess)
-        if(std == 0){
+    private static float sampleNormal(float mean, float std, float max) { //max should be like 30 for splits (guess)
+        if (std == 0) {
             throw new IllegalArgumentException("standard deviation can not be 0");
         }
         float value = 0; // odds of 0 being selected are '0', and we don't want 0 anyway
 
-        while (value == 0 || Math.abs(value) > max){
+        while (value == 0 || Math.abs(value) > max) {
             value = (float) (new Random().nextGaussian() * std + mean);
         }
 
         return value;
     }
 
-
-    private static float sigmoid(float input){
+    private static float sigmoid(float input) {
         double free = Math.pow(Math.E, -input);
         free += 1;
         free = 1 / free;
         return (float) free;
     }
 
-    private boolean isBlack(int x, int y){
+    public void addBranch(Branch branch) {
+        this.branches.add(branch);
+    }
 
-        for(Branch e : this.branches){
-            if(this.isValid(new Node(x, y), e, e.getSize())){
+    public int getSize() {
+        return this.branches.size();
+    }
+
+    public BufferedImage render() {
+        BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+        int white = Color.WHITE.getRGB();
+        int black = Color.BLACK.getRGB();
+        for (int x = 0; x < 100; x++) {
+            for (int y = 0; y < 100; y++) {
+                if (this.isBlack(x, y)) {
+                    image.setRGB(x, y, black);
+                    continue;
+                }
+                image.setRGB(x, y, white);
+            }
+        }
+        return image;
+    }
+
+    private boolean isBlack(int x, int y) {
+
+        for (Branch e : this.branches) {
+            if (this.isValid(new Node(x, y), e, e.getSize())) {
                 return true;
             }
         }
@@ -186,12 +184,12 @@ public class TreeSkeleton {
     }
 
     private boolean isValid(Node p, Branch e, float edgeSize) {
-        if(p.distance(e.getA()) < edgeSize || p.distance(e.getB()) < edgeSize){
+        if (p.distance(e.getA()) < edgeSize || p.distance(e.getB()) < edgeSize) {
             return true;
         }
 
         double distance = pointLineDistance(p, e.getA(), e.getB());
-        if(distance > edgeSize) {
+        if (distance > edgeSize) {
             return false;
         }
 
@@ -209,9 +207,9 @@ public class TreeSkeleton {
         } else {
             double xDiff = b.x - a.x;
             double yDiff = b.y - a.y;
-            double num = Math.abs(yDiff*p.x - xDiff*p.y + b.x*a.y - b.y*a.x);
-            double den = Math.sqrt(yDiff*yDiff + xDiff*xDiff);
-            return num/den;
+            double num = Math.abs(yDiff * p.x - xDiff * p.y + b.x * a.y - b.y * a.x);
+            double den = Math.sqrt(yDiff * yDiff + xDiff * xDiff);
+            return num / den;
         }
     }
 

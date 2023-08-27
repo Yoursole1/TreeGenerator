@@ -40,7 +40,7 @@ public class TreeSkeleton {
     public BufferedImage render() {
         BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         int white = Color.WHITE.getRGB();
-        int black = Color.BLACK.getRGB();
+        int black = Color.DARK_GRAY.getRGB();
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 if (this.isBlack(x, y)) {

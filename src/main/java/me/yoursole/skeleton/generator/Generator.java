@@ -51,7 +51,6 @@ public class Generator {
         TreeSkeleton skeleton = new TreeSkeleton();
         skeleton = new TrunkGenerator(skeleton).generate(this.spread, this.split, this.branch, this.variability, this.branchHeight);
         skeleton = new BranchGenerator(skeleton).generate(this.spread, this.split, this.branch, this.variability, this.branchHeight);
-        skeleton = new GravityGenerator(skeleton).generate(this.spread, this.split, this.branch, this.variability, this.branchHeight);
         return skeleton;
     }
 
@@ -318,17 +317,5 @@ class BranchGenerator extends GeneratorLayer {
 
 
         return subtree;
-    }
-}
-
-class GravityGenerator extends GeneratorLayer {
-
-    public GravityGenerator(TreeSkeleton input) {
-        super(input);
-    }
-
-    @Override
-    TreeSkeleton generate(float spread, float split, float branch, float variability, float branchHeight) {
-        return super.getInput();
     }
 }

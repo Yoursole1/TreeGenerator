@@ -26,9 +26,8 @@ public class TreeSkeleton {
         return this.branches.size();
     }
 
-    public TreeSkeleton merge(TreeSkeleton other){
+    public void merge(TreeSkeleton other){
         this.branches.addAll(other.branches);
-        return this;
     }
 
     public BufferedImage render(){

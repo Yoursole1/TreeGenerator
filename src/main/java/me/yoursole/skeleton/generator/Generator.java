@@ -204,7 +204,7 @@ class BranchGenerator extends GeneratorLayer {
             float m = (b.getA().y - b.getB().y) / (b.getA().x - b.getB().x);
             float y = m * x - m * b.getA().x + b.getA().y;
 
-            super.getInput().merge(this.generateSubTree(x, y, baseAngle, size));
+            super.getInput().merge(this.generateSubTree(x, y, baseAngle, size, variability, split, spread));
         }
 
         // generate and add stuff to the skeleton
@@ -212,8 +212,89 @@ class BranchGenerator extends GeneratorLayer {
         this.generate(spread, split, branch, variability, branchHeight, size*2/3);
     }
 
-    private TreeSkeleton generateSubTree(float x, float y, float angle, float size){
-        return new TreeSkeleton();
+    private TreeSkeleton generateSubTree(float x, float y, float angle, float size, float variability, float split, float spread){
+        TreeSkeleton subtree = new TreeSkeleton();
+
+        List<Node> tipNodes = new ArrayList<>(); //Nodes that can currently be appended to (removed after a connection is made)
+        List<Float> tipAngles = new ArrayList<>(); //angles that each tip is at (associated by index)
+
+        tipNodes.add(new Node(x, y)); //initial node
+        tipAngles.add(angle);
+
+        int height = (int) ((NumericalBase)new NormalDist(5, variability).f()).getReal();
+
+        Function splitRate = t -> { // x is number of branches formed
+            double n = ((NumericalBase)t[0]).getReal();
+
+            return new NumericalBase(split)
+                    .multiply(new NumericalBase(
+                            Math.pow(Math.E, -Math.pow(n - 5, 2))
+                    ));
+        };
+
+        for (int i = 0; i < height; i++) {
+            boolean isSplit = Math.random() < ((NumericalBase)splitRate.f(new NumericalBase(i))).getReal();
+            int splitIndex = new Random().nextInt(tipNodes.size()); // used if we are splitting (only one split per "height layer")
+
+            List<Node> tipNodesNew = new ArrayList<>();
+            List<Float> tipAnglesNew = new ArrayList<>();
+
+            for (int j = 0; j < tipNodes.size(); j++){
+                Node currentNode = tipNodes.get(j);
+                NumericalBase currentAngle = new NumericalBase(tipAngles.get(j));
+
+                if (isSplit && j == splitIndex){
+                    // perform split
+
+                    NumericalBase angleA = (NumericalBase) new NormalDist(spread * -10,  variability * 10).f().add(currentAngle); // angle of branches from a split
+                    NumericalBase angleB = (NumericalBase) new NormalDist(spread * 10,  variability * 10).f().add(currentAngle);
+
+                    Branch branchA = super.createBranch(
+                            currentNode,
+                            (float) angleA.getReal(),
+                            size
+                    );
+
+                    Branch branchB = super.createBranch(
+                            currentNode,
+                            (float) angleB.getReal(),
+                            size
+                    );
+
+                    tipNodesNew.add(branchA.getB());
+                    tipNodesNew.add(branchB.getB());
+
+                    tipAnglesNew.add((float) angleA.getReal());
+                    tipAnglesNew.add((float) angleB.getReal());
+
+                    subtree.addBranch(branchA);
+                    subtree.addBranch(branchB);
+
+                    continue;
+                }
+                // grow tip node
+
+                NumericalBase a = (NumericalBase) new NormalDist(0, spread * 10).f().add(currentAngle);
+
+                Branch newBranch = super.createBranch(
+                        currentNode,
+                        (float) a.getReal(),
+                        size
+                );
+
+                tipNodesNew.add(newBranch.getB());
+
+                tipAnglesNew.add((float) a.getReal());
+
+                subtree.addBranch(newBranch);
+            }
+
+            tipNodes = tipNodesNew;
+            tipAngles = tipAnglesNew;
+        }
+
+
+        return subtree;
     }
 }
 

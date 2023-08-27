@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class TreeGUI {
     public static void open() {
@@ -50,15 +51,18 @@ public class TreeGUI {
 
         saveButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                    "JPG Images", "jpg");
+            fileChooser.setFileFilter(filter);
             fileChooser.setDialogTitle("Specify a file to save");
             int userSelection = fileChooser.showSaveDialog(frame);
 
             if (userSelection == JFileChooser.APPROVE_OPTION) {
                 File fileToSave = fileChooser.getSelectedFile();
-                System.out.println("Save as file: " + fileToSave.getAbsolutePath());
 
-                BufferedImage img = new BufferedImage(imageLabel.getWidth(), imageLabel.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                BufferedImage img = new BufferedImage(imageLabel.getWidth(), imageLabel.getHeight(), BufferedImage.TYPE_INT_RGB);
                 Graphics g = img.createGraphics();
+                imageLabel.printAll(g);
                 imageLabel.paint(g);
                 g.dispose();
 

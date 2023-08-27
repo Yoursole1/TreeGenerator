@@ -13,7 +13,7 @@ public abstract class GeneratorLayer {
         this.input = input;
     }
 
-    abstract TreeSkeleton generate(float spread, float split, float branch, float pull, float branchHeight);
+    abstract TreeSkeleton generate(float spread, float split, float branch, float variability, float branchHeight);
 
     public TreeSkeleton getInput() {
         return input;
@@ -26,6 +26,6 @@ public abstract class GeneratorLayer {
 
         starting = (NumericalBase) starting.add(new NumericalBase(base.x, base.y));
         Node newNode = new Node((float) starting.getReal(), (float) starting.getImaginary());
-        return new Branch(base, newNode, size);
+        return new Branch(base, newNode, size, angle);
     }
 }

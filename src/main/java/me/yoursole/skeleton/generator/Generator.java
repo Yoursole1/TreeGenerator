@@ -134,7 +134,7 @@ class TrunkGenerator extends GeneratorLayer {
                 }
                 // grow tip node
 
-                NumericalBase angle = (NumericalBase) new NormalDist(0, spread * 10).f().add(currentAngle);
+                NumericalBase angle = (NumericalBase) new NormalDist(0, spread * variability * 10).f().add(currentAngle);
 
                 Branch newBranch = super.createBranch(
                         currentNode,
@@ -169,25 +169,27 @@ class BranchGenerator extends GeneratorLayer {
 
     @Override
     TreeSkeleton generate(float spread, float split, float branch, float variability, float branchHeight) {
-        this.generate(spread, split, branch, variability, branchHeight, 1);
+        this.generate(spread, split, branch, variability, branchHeight, 1f);
         return super.getInput();
     }
 
     private void generate(float spread, float split, float branch, float variability, float branchHeight, float size){
-        if (size <= 0.1){
+        if (size <= 0.5){
             return;
         }
 
         Random r = new Random();
 
+        List<TreeSkeleton> branches = new ArrayList<>();
+
         // size 1 -> 2/3 -> 4/9 -> 8/27
         for (Branch b : super.getInput().getBranches()){
 
-            if (!(b.getSize() > size)){
+            if (!(b.getSize() > size) || Math.abs(b.getSize() - size) > 1){
                 continue;
             }
 
-            boolean shouldBranch = Math.random() > branch;
+            boolean shouldBranch = Math.random() < branch;
 
             if (!shouldBranch){
                 continue;
@@ -204,7 +206,11 @@ class BranchGenerator extends GeneratorLayer {
             float m = (b.getA().y - b.getB().y) / (b.getA().x - b.getB().x);
             float y = m * x - m * b.getA().x + b.getA().y;
 
-            super.getInput().merge(this.generateSubTree(x, y, baseAngle, size, variability, split, spread));
+            branches.add(this.generateSubTree(x, y, baseAngle, size, variability, split, spread));
+        }
+
+        for (TreeSkeleton skeleton : branches){
+            super.getInput().merge(skeleton);
         }
 
         // generate and add stuff to the skeleton
@@ -274,7 +280,7 @@ class BranchGenerator extends GeneratorLayer {
                 }
                 // grow tip node
 
-                NumericalBase a = (NumericalBase) new NormalDist(0, spread * 10).f().add(currentAngle);
+                NumericalBase a = (NumericalBase) new NormalDist(0, variability * spread * 10).f().add(currentAngle);
 
                 Branch newBranch = super.createBranch(
                         currentNode,

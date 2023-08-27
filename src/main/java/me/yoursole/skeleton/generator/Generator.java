@@ -20,8 +20,8 @@ public class Generator {
     protected static final float DEFAULT_HEIGHT_VARIABILITY = 2;
     protected static final float DEFAULT_ANGLE_SPREAD_NEGATIVE = -10;
     protected static final float DEFAULT_ANGLE_SPREAD_POSITIVE = 10;
-    protected static final float DEFAULT_ANGLE_VARIABILITY_MULTIPLIER = 10;
-    protected static final float DEFAULT_BRANCH_SIZE = 20;
+    protected static final float DEFAULT_ANGLE_VARIABILITY_MULTIPLIER = 15;
+    protected static final float DEFAULT_BRANCH_SIZE = 40;
 
     private final float spread;
     private final float split;
@@ -172,6 +172,7 @@ class BranchGenerator extends GeneratorLayer {
     private static final float BASE_SIZE_REDUCTION = 0.1f;
     private static final float BASE_SIZE_CUTOFF = 0.6f;
     private static final float BASE_ANGLE_VARIABILITY = 5;
+    private static final float BRANCH_SIZE_CUTOFF = 2;
 
     public BranchGenerator(TreeSkeleton input) {
         super(input);
@@ -195,7 +196,7 @@ class BranchGenerator extends GeneratorLayer {
         // size 1 -> 2/3 -> 4/9 -> 8/27
         for (Branch b : super.getInput().getBranches()){
 
-            if (!(b.getSize() > size) || Math.abs(b.getSize() - size) > 1){
+            if (!(b.getSize() > size) || Math.abs(b.getSize() - size) > BRANCH_SIZE_CUTOFF){
                 continue;
             }
 

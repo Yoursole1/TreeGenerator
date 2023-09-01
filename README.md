@@ -18,4 +18,4 @@ The generator works in layers, implemented by the GeneratorLayer class.
 These layers pass the TreeSkeleton along as it gets a trunk, then branches, 
 then leaves generated. The trunk is generated first, then locations are
 selected for branches.  Branches are the same as the trunk, but are rotated
-and offset onto the trunk
+and offset onto the trunk.  

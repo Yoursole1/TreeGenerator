@@ -13,3 +13,9 @@ This project defines a tree using a few parameters:
                 base parameters
     - Branch height: **NOT IMPL**, will define height at which
                     branching starts. 
+
+The generator works in layers, implemented by the GeneratorLayer class.
+These layers pass the TreeSkeleton along as it gets a trunk, then branches, 
+then leaves generated. The trunk is generated first, then locations are
+selected for branches.  Branches are the same as the trunk, but are rotated
+and offset onto the trunk

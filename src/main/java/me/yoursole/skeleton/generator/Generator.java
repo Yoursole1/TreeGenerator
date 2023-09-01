@@ -84,6 +84,7 @@ class TrunkGenerator extends GeneratorLayer {
         tipNodes.add(new Node(TreeSkeleton.WIDTH / 2.0f, TreeSkeleton.HEIGHT)); //initial node
         tipAngles.add(0f);
 
+
         int height = (int) ((NumericalBase) new NormalDist(DEFAULT_HEIGHT_MEAN, DEFAULT_HEIGHT_VARIABILITY  * variability).f()).getReal();
 
         Function splitRate = x -> { // x is number of branches formed

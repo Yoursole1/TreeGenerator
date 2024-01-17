@@ -13,6 +13,7 @@ This project defines a tree using a few parameters:
                 base parameters
     - Branch height: **NOT IMPL**, will define height at which
                     branching starts. 
+<img width="470" alt="Screenshot 2024-01-16 at 20 31 23" src="https://github.com/Yoursole1/TreeGenerator/assets/80355246/a0da88f8-b8f6-4ae4-b7bf-b913879cfc0b">
 
 The generator works in layers, implemented by the GeneratorLayer class.
 These layers pass the TreeSkeleton along as it gets a trunk, then branches, 
